@@ -1,0 +1,39 @@
+{
+  "name": "mbtiles-compress",
+  "version": "0.0.0",
+  "description": "A command line tool to compress MBTiles files using WebP compression",
+  "type": "module",
+  "main": "index.js",
+  "bin": {
+    "mbtiles-compress": "./index.js"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"YOLO\"",
+    "release": "np"
+  },
+  "keywords": [
+    "mbtiles",
+    "compression",
+    "webp",
+    "tiles",
+    "maps"
+  ],
+  "files": [
+    "index.js"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "12.2.0",
+    "commander": "14.0.1",
+    "imagemin": "9.0.1",
+    "imagemin-webp": "8.0.0"
+  },
+  "devDependencies": {
+    "np": "*"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

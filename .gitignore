@@ -1,0 +1,6 @@
+node_modules
+*.mbtiles
+*.mbtiles-shm
+*.mbtiles-wal
+yarn.lock
+.DS_Store
