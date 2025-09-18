@@ -3,7 +3,9 @@
   "version": "1.0.4",
   "description": "A command line tool to compress MBTiles files using WebP compression",
   "type": "module",
-  "bin": "./cli.js",
+  "bin": {
+    "mbtiles-compress": "./index.js"
+  },
   "scripts": {
     "start": "node index.js",
     "test": "echo \"YOLO\"",
