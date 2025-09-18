@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 import { createHash } from 'crypto'
 import Database from 'better-sqlite3'
 import imagemin from 'imagemin'
