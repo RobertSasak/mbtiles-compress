@@ -20,7 +20,7 @@
     "maps"
   ],
   "files": [
-    "index.js"
+    "cli.js"
   ],
   "author": "",
   "license": "MIT",
