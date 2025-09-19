@@ -27,12 +27,14 @@ program
     '20'
   )
   .option('-f, --force', 'Overwrite destination if it exists', false)
+  .option('-s, --skip-count', 'Skip counting rows before compression', false)
   .action(async (source, destination, options) => {
     const quality = parseInt(options.quality)
     const alphaQuality = parseInt(options.alphaQuality)
     const method = parseInt(options.method)
     const concurrency = parseInt(options.concurrency)
     const force = !!options.force
+    const skipCount = !!options.skipCount
 
     if (isNaN(quality) || quality < 0 || quality > 100) {
       throw new Error('Quality must be a number between 0 and 100')
@@ -65,7 +67,15 @@ program
       unlinkSync(destination)
     }
 
-    await run(source, destination, quality, alphaQuality, method, concurrency)
+    await run(
+      source,
+      destination,
+      quality,
+      alphaQuality,
+      method,
+      concurrency,
+      skipCount
+    )
   })
 
 try {

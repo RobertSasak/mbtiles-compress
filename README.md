@@ -37,6 +37,7 @@ Options:
   -m, --method <number>         WebP compression method (0-6, default: 4) (default: "4")
   -c, --concurrency <number>    Number of parallel compression operations (default: "20")
   -f, --force                   Overwrite destination if it exists (default: false)
+  -s, --skip-count              Skip counting rows before compression (default: false)
   -h, --help                    display help for command
 ```
 

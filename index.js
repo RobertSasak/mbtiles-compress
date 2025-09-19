@@ -35,6 +35,7 @@ async function compressTile(tileData, quality, alphaQuality, method) {
  * @param {number} alphaQuality - WebP alpha quality (0-100)
  * @param {number} method - WebP compression method (0-6)
  * @param {number} concurrency - Number of parallel compression operations
+ * @param {boolean} [skipCount=false] - If true, skip counting rows and progress reporting
  * @returns {Promise<void>} Resolves when compression is complete
  */
 async function run(
@@ -43,7 +44,8 @@ async function run(
   quality,
   alphaQuality,
   method,
-  concurrency
+  concurrency,
+  skipCount = false
 ) {
   const sourceDb = new Database(source, { readonly: true })
   const destDb = new Database(destination)
@@ -78,11 +80,13 @@ async function run(
       }
     }
 
-    console.log('Compressing image tiles')
-    const totalCount = sourceDb
-      .prepare(`SELECT COUNT(*) as count FROM map`)
-      .get().count
-    console.log(`Found ${totalCount} image tiles to compress`)
+    let totalCount = undefined
+    if (!skipCount) {
+      totalCount = sourceDb
+        .prepare(`SELECT COUNT(*) as count FROM map`)
+        .get().count
+      console.log(`Found ${totalCount} image tiles to compress`)
+    }
 
     let processed = 0
     let failed = 0
@@ -97,6 +101,8 @@ async function run(
     const tiles = sourceDb
       .prepare(`SELECT zoom_level, tile_column, tile_row, tile_data FROM tiles`)
       .iterate()
+
+    console.log('Compressing image tiles')
 
     for (const { zoom_level, tile_column, tile_row, tile_data } of tiles) {
       if (activePromises.size >= concurrency) {
@@ -125,7 +131,11 @@ async function run(
         .finally(() => {
           processed++
           if (processed % 100 === 0) {
-            console.log(`Processed ${processed}/${totalCount} image tiles`)
+            console.log(
+              `Processed ${processed}${
+                totalCount ? '/' + totalCount : ''
+              } image tiles`
+            )
           }
           activePromises.delete(compressionPromise)
         })
