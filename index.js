@@ -80,7 +80,7 @@ async function run(
 
     console.log('Compressing image tiles')
     const totalCount = sourceDb
-      .prepare(`SELECT COUNT(*) as count FROM tiles`)
+      .prepare(`SELECT COUNT(*) as count FROM map`)
       .get().count
     console.log(`Found ${totalCount} image tiles to compress`)
 
