@@ -25,7 +25,8 @@
     "index.js",
     "cli.js"
   ],
-  "author": "",
+  "author": "Robert Sasak",
+  "repository": "https://github.com/RobertSasak/mbtiles-compress.git",
   "license": "MIT",
   "dependencies": {
     "better-sqlite3": "12.2.0",
