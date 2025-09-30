@@ -91,7 +91,7 @@ async function run(
     let failed = 0
     const activePromises = new Set()
 
-    const insertTile = destDb.prepare(
+    const insertImage = destDb.prepare(
       `INSERT OR IGNORE INTO images (tile_id, tile_data) VALUES (?, ?)`
     )
     const insertMap = destDb.prepare(
@@ -99,11 +99,12 @@ async function run(
     )
     const tiles = sourceDb
       .prepare(`SELECT zoom_level, tile_column, tile_row, tile_data FROM tiles`)
+      .raw()
       .iterate()
 
     console.log('Compressing image tiles')
 
-    for (const { zoom_level, tile_column, tile_row, tile_data } of tiles) {
+    for (const [zoom_level, tile_column, tile_row, tile_data] of tiles) {
       if (activePromises.size >= concurrency) {
         await Promise.race(activePromises)
       }
@@ -117,7 +118,7 @@ async function run(
         .then(async (compressedData) => {
           const newTileId = md5_hex(compressedData)
           await Promise.all([
-            insertTile.run(newTileId, compressedData),
+            insertImage.run(newTileId, compressedData),
             insertMap.run(zoom_level, tile_column, tile_row, newTileId),
           ])
         })
