@@ -45,8 +45,8 @@ program
     if (isNaN(method) || method < 0 || method > 6) {
       throw new Error('Method must be a number between 0 and 6')
     }
-    if (isNaN(concurrency) || concurrency < 1 || concurrency > 100) {
-      throw new Error('Concurrency must be a number between 1 and 100')
+    if (isNaN(concurrency) || concurrency < 1) {
+      throw new Error('Concurrency must be a number greater than 0')
     }
     if (!existsSync(source)) {
       throw new Error(`Source file does not exist: ${source}`)
