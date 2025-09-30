@@ -1,7 +1,6 @@
 import { createHash } from 'crypto'
 import Database from 'better-sqlite3'
-import imagemin from 'imagemin'
-import imageminWebp from 'imagemin-webp'
+import sharp from 'sharp'
 
 /**
  * Compute MD5 hex digest of a Buffer
@@ -15,15 +14,15 @@ function md5_hex(buffer) {
 /**
  * Compress a single tile's raw data buffer
  * @param {Buffer} tileData - Raw image tile buffer
- * @param {number} quality - WebP compression quality (0-100)r\
+ * @param {number} quality - WebP compression quality (0-100)
  * @param {number} alphaQuality - WebP alpha quality (0-100)
  * @param {number} method - WebP compression method (0-6)
  * @returns {Promise<Buffer>} Compressed tile data
  */
 async function compressTile(tileData, quality, alphaQuality, method) {
-  return await imagemin.buffer(tileData, {
-    plugins: [imageminWebp({ quality, alphaQuality, method })],
-  })
+  return await sharp(tileData)
+    .webp({ quality, alphaQuality, effort: method })
+    .toBuffer()
 }
 
 /**
