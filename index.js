@@ -85,7 +85,7 @@ async function run(
     let totalCount = undefined
     if (!skipCount) {
       totalCount = sourceDb
-        .prepare(`SELECT COUNT(*) as count FROM map`)
+        .prepare(`SELECT COUNT(*) as count FROM images`)
         .get().count
       console.log(`Found ${totalCount} image tiles to compress`)
     }
