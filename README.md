@@ -57,8 +57,16 @@ npx mbtiles-compress input.mbtiles output.mbtiles -c 100
 npx mbtiles-compress input.mbtiles output.mbtiles -m 6
 ```
 
-## WebP Parameters
+### WebP Parameters
 
 - **Quality (0-100)**: Controls the overall image quality. Higher values = better quality but larger files
 - **Alpha Quality (0-100)**: Controls the quality of alpha channel (transparency). 0 = lossy alpha, 100 = lossless alpha
 - **Method (0-6)**: Compression method/speed tradeoff. 0 = fastest compression, 6 = best compression (slowest)
+
+## Performance
+
+Under the hood, this tool uses the `sharp` library. In addition to concurrency, also `UV_THREADPOOL_SIZE` environment variable can be set to get the best performance. See [sharp's documentation](https://sharp.pixelplumbing.com/performance) for more details.
+
+```bash
+UV_THREADPOOL_SIZE=64 npx mbtiles-compress input.mbtiles output.mbtiles -c 100
+```
