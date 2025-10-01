@@ -123,12 +123,10 @@ async function run(
           await destDb.transaction(() => {
             insertImage.run(newTileId, compressedData)
             updateMap.run(newTileId, tile_id)
-          })
+          })()
         })
         .catch(({ message }) => {
-          console.warn(
-            `Failed to compress tile ${zoom_level}, ${tile_column}, ${tile_row}: ${message}`
-          )
+          console.warn(`Failed to compress tile ${tile_id}: ${message}`)
           failed++
         })
         .finally(() => {
