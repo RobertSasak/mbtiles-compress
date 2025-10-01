@@ -63,10 +63,10 @@ async function run(
       }
     }
 
-    // Attach and copy all tables except images and map
+    // Attach and copy all tables except images
     destDb.exec(`ATTACH DATABASE '${source}' AS source`)
     for (const { name, type } of objects) {
-      if (type === 'table' && name !== 'images' && name !== 'map') {
+      if (type === 'table' && name !== 'images') {
         destDb.exec(`INSERT INTO ${name} SELECT * FROM source.${name}`)
       }
     }
@@ -78,6 +78,9 @@ async function run(
         destDb.exec(sql)
       }
     }
+
+    // Create a temporary index to speed up map lookups
+    destDb.exec('CREATE INDEX map_tile_id ON map (tile_id)')
 
     let totalCount = undefined
     if (!skipCount) {
@@ -94,17 +97,17 @@ async function run(
     const insertImage = destDb.prepare(
       `INSERT OR IGNORE INTO images (tile_id, tile_data) VALUES (?, ?)`
     )
-    const insertMap = destDb.prepare(
-      `INSERT INTO map (zoom_level, tile_column, tile_row, tile_id, grid_id) VALUES (?, ?, ?, ?, null)`
+    const updateMap = destDb.prepare(
+      `UPDATE map SET tile_id = ? WHERE tile_id = ?`
     )
     const tiles = sourceDb
-      .prepare(`SELECT zoom_level, tile_column, tile_row, tile_data FROM tiles`)
+      .prepare(`SELECT tile_id, tile_data FROM images`)
       .raw()
       .iterate()
 
     console.log('Compressing image tiles')
 
-    for (const [zoom_level, tile_column, tile_row, tile_data] of tiles) {
+    for (const [tile_id, tile_data] of tiles) {
       if (activePromises.size >= concurrency) {
         await Promise.race(activePromises)
       }
@@ -117,10 +120,10 @@ async function run(
       )
         .then(async (compressedData) => {
           const newTileId = md5_hex(compressedData)
-          await Promise.all([
-            insertImage.run(newTileId, compressedData),
-            insertMap.run(zoom_level, tile_column, tile_row, newTileId),
-          ])
+          await destDb.transaction(() => {
+            insertImage.run(newTileId, compressedData)
+            updateMap.run(newTileId, tile_id)
+          })
         })
         .catch(({ message }) => {
           console.warn(
@@ -152,6 +155,7 @@ async function run(
     }
 
     console.log('Optimizing destination database')
+    destDb.exec('DROP INDEX map_tile_id') // Drop temporary index
     destDb.exec('PRAGMA optimize')
     destDb.exec('ANALYZE')
     destDb.exec('VACUUM')
