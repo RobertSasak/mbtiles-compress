@@ -2,6 +2,8 @@ import { createHash } from 'crypto'
 import Database from 'better-sqlite3'
 import sharp from 'sharp'
 
+const LOG_FREQUENCY = 100
+
 /**
  * Compute MD5 hex digest of a Buffer
  * @param {Buffer} buffer - Image buffer
@@ -107,6 +109,7 @@ async function run(
 
     console.log('Compressing image tiles')
 
+    const start = performance.now()
     for (const [tile_id, tile_data] of tiles) {
       if (activePromises.size >= concurrency) {
         await Promise.race(activePromises)
@@ -131,11 +134,19 @@ async function run(
         })
         .finally(() => {
           processed++
-          if (processed % 100 === 0) {
-            console.log(
-              `Processed ${processed}${
+          if (processed % LOG_FREQUENCY === 0) {
+            const elapsed = performance.now() - start
+            const perSecond = (1000 * processed) / elapsed
+            const eta = new Intl.DurationFormat('en', {
+              style: 'short',
+            }).format({
+              seconds: Math.round((totalCount - processed) / perSecond),
+            })
+
+            process.stdout.write(
+              `\rProcessed ${processed}${
                 totalCount ? '/' + totalCount : ''
-              } image tiles`
+              } image tiles ~ ${perSecond.toFixed(0)} tiles/s  ETA: ${eta}`
             )
           }
           activePromises.delete(compressionPromise)
@@ -144,7 +155,7 @@ async function run(
     }
     await Promise.all(activePromises)
 
-    console.log(`Successfully processed ${processed} image tiles.`)
+    console.log(`\nSuccessfully processed ${processed} image tiles.`)
     if (failed > 0) {
       console.log(
         '\x1b[33m%s\x1b[0m',
