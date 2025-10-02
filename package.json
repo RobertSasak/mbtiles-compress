@@ -1,6 +1,6 @@
 {
   "name": "mbtiles-compress",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "description": "A command line tool to compress MBTiles files using WebP compression",
   "type": "module",
   "main": "./index.js",
