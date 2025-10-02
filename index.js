@@ -163,11 +163,11 @@ async function run(
       )
     }
 
-    console.log('Optimizing destination database')
-    destDb.exec('DROP INDEX map_tile_id') // Drop temporary index
-    destDb.exec('PRAGMA optimize')
-    destDb.exec('ANALYZE')
-    destDb.exec('VACUUM')
+    console.log('Optimizing database')
+    await destDb.exec('DROP INDEX map_tile_id') // Drop temporary index
+    await destDb.exec('PRAGMA optimize')
+    await destDb.exec('ANALYZE')
+    await destDb.exec('VACUUM')
     console.log('Compression completed successfully!')
   } finally {
     sourceDb.close()

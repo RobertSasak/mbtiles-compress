@@ -68,5 +68,6 @@ npx mbtiles-compress input.mbtiles output.mbtiles -m 6
 Under the hood, this tool uses the `sharp` library. In addition to concurrency, also `UV_THREADPOOL_SIZE` environment variable can be set to get the best performance. See [sharp's documentation](https://sharp.pixelplumbing.com/performance) for more details.
 
 ```bash
-UV_THREADPOOL_SIZE=64 npx mbtiles-compress input.mbtiles output.mbtiles -c 100
+export UV_THREADPOOL_SIZE=64
+npx mbtiles-compress input.mbtiles output.mbtiles -c 100
 ```
